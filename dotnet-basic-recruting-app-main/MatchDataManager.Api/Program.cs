@@ -1,13 +1,24 @@
+using MatchDataManager.Api.Data;
 using MatchDataManager.Api.Interfaces;
 using MatchDataManager.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddDbContext<MatchDataDbContext>(
+        options => options.UseSqlite("name=ConnectionStrings:DefaultConnection"));
+
+
 builder.Services.AddTransient<ILocationsRepository, LocationsRepository>();
 
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
+builder.Services.AddScoped<ITeamsRepository, TeamsRepository>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
