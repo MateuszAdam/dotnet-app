@@ -18,12 +18,13 @@ public class TeamsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddTeam(TeamModel team)
     {
-        //walidacja do dodania
-
-        int id = await _teamsRepository.AddTeam(team);
-        if (id > 0)
+        if (ModelState.IsValid)
         {
-            return CreatedAtAction(nameof(GetById), new { id = team.Id }, team);
+            int id = await _teamsRepository.AddTeam(team);
+            if (id > 0)
+            {
+                return CreatedAtAction(nameof(GetById), new { id = team.Id }, team);
+            }
         }
         return BadRequest();
     }
@@ -69,11 +70,14 @@ public class TeamsController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateTeam(TeamModel team)
     {
-        var id = await _teamsRepository.UpdateTeam(team);
-
-        if (id > 0)
+        if (ModelState.IsValid)
         {
-            return CreatedAtAction(nameof(UpdateTeam), team);
+            var id = await _teamsRepository.UpdateTeam(team);
+
+            if (id > 0)
+            {
+                return CreatedAtAction(nameof(UpdateTeam), team);
+            }
         }
         return NotFound();
     }

@@ -1,13 +1,10 @@
-using MatchDataManager.Api.ActionFilters;
 using MatchDataManager.Api.Interfaces;
 using MatchDataManager.Api.Models;
-using MatchDataManager.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchDataManager.Api.Controllers;
 
 [ApiController]
-//[LocationActionFilter] 
 [Route("[controller]")]
 public class LocationsController : ControllerBase
 {
@@ -21,11 +18,16 @@ public class LocationsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddLocation(LocationModel location)
     {
-        int id = await _locationsRepository.AddLocation(location);
-        if(id > 0)
+        if (ModelState.IsValid)
         {
-            return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
+            int id = await _locationsRepository.AddLocation(location);
+            if (id > 0)
+            {
+                ModelState.Clear();
+                return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
+            }
         }
+       
         return BadRequest();        
     }
 
@@ -68,12 +70,16 @@ public class LocationsController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> UpdateLocation(LocationModel location)
     {
-        var id = await _locationsRepository.UpdateLocation(location);
-
-        if (id > 0)
+        if (ModelState.IsValid)
         {
-            return CreatedAtAction(nameof(UpdateLocation), location);
+            var id = await _locationsRepository.UpdateLocation(location);
+
+            if (id > 0)
+            {
+                return CreatedAtAction(nameof(UpdateLocation), location);
+            }
         }
+
         return NotFound();
     }
 }
