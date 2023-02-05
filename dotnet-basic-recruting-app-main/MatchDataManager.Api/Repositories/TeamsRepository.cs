@@ -9,7 +9,7 @@ public class TeamsRepository : ITeamsRepository
 {
     private readonly MatchDataDbContext _context;
     
-    TeamsRepository(MatchDataDbContext context)
+    public TeamsRepository(MatchDataDbContext context)
     {
         _context = context;
     }
