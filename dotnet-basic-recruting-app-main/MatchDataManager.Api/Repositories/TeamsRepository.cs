@@ -14,9 +14,9 @@ public class TeamsRepository : ITeamsRepository
         _context = context;
     }
 
-    public void AddTeam(TeamModel team)
+    public async Task<int> AddTeam(TeamModel team)
     {
-        var existingTeam = _context.Teams.FirstOrDefault(x => x.Name == team.Name);
+        var existingTeam = await _context.Teams.FirstOrDefaultAsync(x => x.Name == team.Name);
         if (existingTeam is null)
         {
             var newTeam = new Team()
@@ -25,113 +25,46 @@ public class TeamsRepository : ITeamsRepository
                 CoachName = team.CoachName,
             };
 
-            _context.Teams.Add(newTeam);
-            _context.SaveChanges();
+            await _context.Teams.AddAsync(newTeam);
+            await _context.SaveChangesAsync();
+            
+            return newTeam.Id;
         }
+        return 0;
     }
 
-    public void DeleteTeam(int teamId)
+    public async Task<int> DeleteTeam(int teamId)
     {
-        _context.Teams.Where(x => x.Id == teamId).ExecuteDelete();
-        _context.SaveChanges();
+        return await _context.Teams.Where(x => x.Id == teamId).ExecuteDeleteAsync();
     }
 
-    public IEnumerable<TeamModel> GetAllTeams()
+    public async Task<ICollection<TeamModel>> GetAllTeams()
     {
-        return _context.Teams.Select(team => new TeamModel()
+        return await _context.Teams.Select(team => new TeamModel()
         {
             Id = team.Id,
             Name = team.Name,
             CoachName = team.CoachName
-        }).ToList();
+        }).ToListAsync();
     }
 
-    public TeamModel GetTeamById(int id)
+    public async Task<TeamModel> GetTeamById(int id)
     {
-        return _context.Teams.Where(x => x.Id == id)
+        return await _context.Teams.Where(x => x.Id == id)
              .Select(team => new TeamModel()
              {
                  Id = team.Id,
                  Name = team.Name,
                  CoachName = team.CoachName,
-             }).FirstOrDefault();
+             }).FirstOrDefaultAsync();
     }
 
-    public void UpdateTeam(TeamModel team)
+    public async Task<int> UpdateTeam(TeamModel team)
     {
-        var existingTeam = _context.Teams.FirstOrDefault(x => x.Id == team.Id);
-        if (existingTeam is null)
-        {
-            throw new ArgumentException("Team doesn't exist.", nameof(team));
-        }
-
-        existingTeam.CoachName = team.CoachName;
-        existingTeam.Name = team.Name;
-
-        _context.Teams.Update(existingTeam);
-        _context.SaveChanges();
+        return await _context.Teams
+           .Where(x => x.Id == team.Id)
+           .ExecuteUpdateAsync(l =>
+               l.SetProperty(x => x.Name, team.Name)
+               .SetProperty(x => x.CoachName, team.CoachName));
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-//using MatchDataManager.Api.Models;
-
-//namespace MatchDataManager.Api.Repositories;
-
-//public class TeamsRepository
-//{
-//    private static readonly List<Team> _teams = new();
-
-//    public static void AddTeam(Team team)
-//    {
-//        var teamAlreadyExists = _teams.FirstOrDefault(x => x.Name == team.Name);
-
-//        if (teamAlreadyExists == null)
-//        {
-//            team.Id = Guid.NewGuid();
-//            _teams.Add(team);
-//        }
-
-//    }
-
-//    public static void DeleteTeam(Guid teamId)
-//    {
-//        var team = _teams.FirstOrDefault(x => x.Id == teamId);
-//        if (team is not null)
-//        {
-//            _teams.Remove(team);
-//        }
-//    }
-
-//    public static IEnumerable<Team> GetAllTeams()
-//    {
-//        return _teams;
-//    }
-
-//    public static Team GetTeamById(Guid id)
-//    {
-//        return _teams.FirstOrDefault(x => x.Id == id);
-//    }
-
-//    public static void UpdateTeam(Team team)
-//    {
-//        var existingTeam = _teams.FirstOrDefault(x => x.Id == team.Id);
-//        if (existingTeam is null || team is null)
-//        {
-//            throw new ArgumentException("Team doesn't exist.", nameof(team));
-//        }
-
-//        existingTeam.CoachName = team.CoachName;
-//        existingTeam.Name = team.Name;
-//    }
-//}

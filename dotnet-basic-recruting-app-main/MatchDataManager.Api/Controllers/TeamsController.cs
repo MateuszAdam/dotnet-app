@@ -1,6 +1,5 @@
 using MatchDataManager.Api.Interfaces;
 using MatchDataManager.Api.Models;
-using MatchDataManager.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MatchDataManager.Api.Controllers;
@@ -17,34 +16,48 @@ public class TeamsController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddTeam(TeamModel team)
+    public async Task<IActionResult> AddTeam(TeamModel team)
     {
-        //walidacja do dodania - metoda powinna coœ zwróciæ - id i albo createdAtAction i success albo no NotFound()
+        //walidacja do dodania
 
-        _teamsRepository.AddTeam(team);
-        return CreatedAtAction(nameof(AddTeam), new {id = team.Id}, team);
+        int id = await _teamsRepository.AddTeam(team);
+        if (id > 0)
+        {
+            return CreatedAtAction(nameof(GetById), new { id = team.Id }, team);
+        }
+        return BadRequest();
     }
 
     [HttpDelete]
-    public IActionResult DeleteTeam(int teamId)
-    {
-        _teamsRepository.DeleteTeam(teamId);
-        return NoContent();
+    public async Task<IActionResult> DeleteTeam(int teamId)
+    {       
+        var id = await _teamsRepository.DeleteTeam(teamId);
+        if (id > 0)
+        {
+            return NoContent();
+        }
+
+        return NotFound();
     }
 
     //changed the action name from Get to GetAllTeams -> to point what the action is actually doing
     [HttpGet]
-    public IActionResult GetAllTeams()
+    public async Task<IActionResult> GetAllTeams()
     {
-        var teams = _teamsRepository.GetAllTeams();
+        var teams =  await _teamsRepository.GetAllTeams();
 
-        return CreatedAtAction(nameof(UpdateTeam), teams);
+        if (teams is null)
+        {
+            return NotFound();
+        }
+
+        return CreatedAtAction(nameof(UpdateTeam), teams); 
     }
 
     [HttpGet("{id:int}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var team = _teamsRepository.GetTeamById(id);
+        var team =  await _teamsRepository.GetTeamById(id);
         if (team is null)
         {
             return NotFound();
@@ -54,9 +67,14 @@ public class TeamsController : ControllerBase
     }
 
     [HttpPut]
-    public IActionResult UpdateTeam(TeamModel team)
-    {       
-        _teamsRepository.UpdateTeam(team);        
-        return CreatedAtAction(nameof(UpdateTeam), team);        
+    public async Task<IActionResult> UpdateTeam(TeamModel team)
+    {
+        var id = await _teamsRepository.UpdateTeam(team);
+
+        if (id > 0)
+        {
+            return CreatedAtAction(nameof(UpdateTeam), team);
+        }
+        return NotFound();
     }
 }

@@ -15,11 +15,11 @@ public class LocationsRepository : ILocationsRepository
         _context = context;
     }
 
-    public void AddLocation(LocationModel location)
+    public async Task<int> AddLocation(LocationModel location)
     {
         // added check if location name isnt already there      
 
-        var existingLocation = _context.Locations.FirstOrDefault(x => x.Name == location.Name);
+        var existingLocation = await _context.Locations.FirstOrDefaultAsync(x => x.Name == location.Name);
         if (existingLocation is null)
         {
             var newLocation = new Location()
@@ -28,55 +28,48 @@ public class LocationsRepository : ILocationsRepository
                 City = location.City
             };
 
-            _context.Locations.Add(newLocation);
-            _context.SaveChanges();
+            await _context.Locations.AddAsync(newLocation);
+            await _context.SaveChangesAsync();
+
+            return newLocation.Id;
         }
-
+        return 0;
     }
 
-    public void DeleteLocation(int locationId)
-    {
-        // thanks to linq no need to check if not null as previously, it executes only when condition is met.
-
-        _context.Locations.Where(x => x.Id == locationId).ExecuteDelete();
-        _context.SaveChanges();
+    public async Task<int> DeleteLocation(int locationId)
+    {       
+        return await _context.Locations.Where(x => x.Id == locationId).ExecuteDeleteAsync();
     }
 
-    public IEnumerable<LocationModel> GetAllLocations()
+    public async Task <ICollection<LocationModel>> GetAllLocations()
     {
-        return _context.Locations.Select(location => new LocationModel()
+        return await _context.Locations.Select(location => new LocationModel()
         {
             Id = location.Id,
             Name = location.Name,
             City = location.City
-        }).ToList();
+        }).ToListAsync();
     }
 
-    public LocationModel GetLocationById(int id)
+    public async Task<LocationModel> GetLocationById(int id)
     {
         //projecting location from db to the location model class 
 
-        return _context.Locations.Where(x => x.Id == id)
+        return await _context.Locations.Where(x => x.Id == id)
              .Select(location => new LocationModel()
              {
                  Id = location.Id,
                  Name = location.Name,
                  City = location.City
-             }).FirstOrDefault();
+             }).FirstOrDefaultAsync();
     }
 
-    public void UpdateLocation(LocationModel location)
+    public async Task<int> UpdateLocation(LocationModel location)
     {
-        var existingLocation = _context.Locations.FirstOrDefault(x => x.Id == location.Id);
-        if (existingLocation is null)
-        {
-            throw new ArgumentException("Location doesn't exist.", nameof(location));
-        }
-
-        existingLocation.City = location.City;
-        existingLocation.Name = location.Name;
-
-        _context.Locations.Update(existingLocation);
-        _context.SaveChanges();
+        return await _context.Locations
+            .Where(x => x.Id == location.Id)
+            .ExecuteUpdateAsync(l => 
+                l.SetProperty(x => x.City,location.City)
+                .SetProperty(x => x.Name, location.Name));
     }
 }

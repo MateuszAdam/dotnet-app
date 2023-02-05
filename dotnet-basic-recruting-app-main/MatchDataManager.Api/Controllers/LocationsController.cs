@@ -17,35 +17,46 @@ public class LocationsController : ControllerBase
     {
         _locationsRepository = locationsRepository;
     }
-
-    // I need to refactor it later making all methods async and returning the result from the methods
-
+        
     [HttpPost]
-    public IActionResult AddLocation(LocationModel location)
+    public async Task<IActionResult> AddLocation(LocationModel location)
     {
-        _locationsRepository.AddLocation(location);
-        return CreatedAtAction(nameof(AddLocation), new { id = location.Id }, location);
+        int id = await _locationsRepository.AddLocation(location);
+        if(id > 0)
+        {
+            return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
+        }
+        return BadRequest();        
     }
 
     [HttpDelete]
-    public IActionResult DeleteLocation(int locationId)
+    public async Task<IActionResult> DeleteLocation(int locationId)
     {
-        _locationsRepository.DeleteLocation(locationId);
-        return NoContent();
+       var id = await _locationsRepository.DeleteLocation(locationId);
+        if (id > 0)
+        {
+            return NoContent();
+        }
+
+        return NotFound();
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAllLocations()
     {
-        var locations = _locationsRepository.GetAllLocations();
-        return CreatedAtAction(nameof(GetAll), locations);
+        var locations = await _locationsRepository.GetAllLocations();
 
+        if(locations != null && locations.Count > 0)
+        {
+            return CreatedAtAction(nameof(GetAllLocations), locations);
+        }
+        return NoContent();
     }
 
     [HttpGet("{id:int}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var location = _locationsRepository.GetLocationById(id);
+        var location = await _locationsRepository.GetLocationById(id);
         if (location is null)
         {
             return NotFound();
@@ -55,9 +66,14 @@ public class LocationsController : ControllerBase
     }
 
     [HttpPut]
-    public IActionResult UpdateLocation(LocationModel location)
+    public async Task<IActionResult> UpdateLocation(LocationModel location)
     {
-        _locationsRepository.UpdateLocation(location);
-        return CreatedAtAction(nameof(UpdateLocation), location);
+        var id = await _locationsRepository.UpdateLocation(location);
+
+        if (id > 0)
+        {
+            return CreatedAtAction(nameof(UpdateLocation), location);
+        }
+        return NotFound();
     }
 }
