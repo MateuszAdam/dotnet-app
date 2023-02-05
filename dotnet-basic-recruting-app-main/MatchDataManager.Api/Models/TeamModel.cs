@@ -3,8 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace MatchDataManager.Api.Models;
 
-public class Team : Entity
+public class TeamModel
 {    
+    public int Id { get; set; }
     [Required]
     [MaxLength(255)]
     public string Name { get; set; }

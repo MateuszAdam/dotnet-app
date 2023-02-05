@@ -9,7 +9,7 @@ namespace MatchDataManager.Api.Controllers;
 public class TeamsController : ControllerBase
 {
     [HttpPost]
-    public IActionResult AddTeam(Team team)
+    public IActionResult AddTeam(TeamModel team)
     {
         TeamsRepository.AddTeam(team);
         return CreatedAtAction(nameof(GetById), new {id = team.Id}, team);
@@ -41,7 +41,7 @@ public class TeamsController : ControllerBase
     }
 
     [HttpPut]
-    public IActionResult UpdateTeam(Team team)
+    public IActionResult UpdateTeam(TeamModel team)
     {
         TeamsRepository.UpdateTeam(team);
         return Ok(team);

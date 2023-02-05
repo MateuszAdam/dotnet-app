@@ -4,16 +4,10 @@ namespace MatchDataManager.Api.Interfaces
 {
     public interface ILocationsRepository
     {
-        public void AddLocation(Location location);
-
-
-        public void DeleteLocation(Guid locationId);
-
-
-        public IEnumerable<Location> GetAllLocations();
-
-        public Location GetLocationById(Guid id);
-
-        public void UpdateLocation(Location location);
+        void AddLocation(LocationModel location);
+        void DeleteLocation(int locationId);
+        IEnumerable<LocationModel> GetAllLocations();
+        LocationModel GetLocationById(int id);
+        void UpdateLocation(LocationModel location);
     }
 }

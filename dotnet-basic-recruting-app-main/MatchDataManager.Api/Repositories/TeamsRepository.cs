@@ -1,60 +1,59 @@
-﻿using MatchDataManager.Api.Interfaces;
+﻿using MatchDataManager.Api.Data;
+using MatchDataManager.Api.Interfaces;
 using MatchDataManager.Api.Models;
 
 namespace MatchDataManager.Api.Repositories;
 
 public class TeamsRepository : ITeamsRepository
-{   
-    private readonly List<Team> _teams;
-    private readonly Team _team;
-
-    TeamsRepository(Team team, ITeamsRepository teamsRepository)
+{
+    private readonly MatchDataDbContext _matchDataDbContext;
+    
+    TeamsRepository(MatchDataDbContext matchDataDbContext)
     {
-        _teams = new List<Team>();
-        this._team = team;
+      _matchDataDbContext = matchDataDbContext;
     }
 
-    public void AddTeam(Team team)
+    public void AddTeam(TeamModel team)
     {
-        var teamAlreadyExists = _teams.FirstOrDefault(x => x.Name == team.Name);
+        //var teamAlreadyExists = _teams.FirstOrDefault(x => x.Name == team.Name);
 
-        if (teamAlreadyExists == null)
-        {
-            team.Id = Guid.NewGuid();
-            _teams.Add(team);
-        }
+        //if (teamAlreadyExists == null)
+        //{
+           
+        //    _teams.Add(team);
+        //}
 
     }
 
-    public void DeleteTeam(Guid teamId)
+    public void DeleteTeam(int teamId)
     {
-        var team = _teams.FirstOrDefault(x => x.Id == teamId);
-        if (team is not null)
-        {
-            _teams.Remove(team);
-        }
+        //var team = _teams.FirstOrDefault(x => x.Id == teamId);
+        //if (team is not null)
+        //{
+        //    _teams.Remove(team);
+        //}
     }
 
-    public IEnumerable<Team> GetAllTeams()
+    public IEnumerable<TeamModel> GetAllTeams()
     {
-        return _teams;
+       // return _teams;
     }
 
-    public Team GetTeamById(Guid id)
+    public TeamModel GetTeamById(int id)
     {
-        return _teams.FirstOrDefault(x => x.Id == id);
+      //  return _teams.FirstOrDefault(x => x.Id == id);
     }
 
-    public void UpdateTeam(Team team)
+    public void UpdateTeam(TeamModel team)
     {
-        var existingTeam = _teams.FirstOrDefault(x => x.Id == team.Id);
-        if (existingTeam is null || team is null)
-        {
-            throw new ArgumentException("Team doesn't exist.", nameof(team));
-        }
+        //var existingTeam = _teams.FirstOrDefault(x => x.Id == team.Id);
+        //if (existingTeam is null || team is null)
+        //{
+        //    throw new ArgumentException("Team doesn't exist.", nameof(team));
+        //}
 
-        existingTeam.CoachName = team.CoachName;
-        existingTeam.Name = team.Name;
+        //existingTeam.CoachName = team.CoachName;
+        //existingTeam.Name = team.Name;
     }
 }
 
