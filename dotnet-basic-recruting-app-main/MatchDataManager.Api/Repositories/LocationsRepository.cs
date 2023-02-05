@@ -20,7 +20,7 @@ public class LocationsRepository : ILocationsRepository
         // added check if location name isnt already there      
 
         var existingLocation = await _context.Locations.FirstOrDefaultAsync(x => x.Name == location.Name);
-        if (existingLocation is null)
+        if (existingLocation != null)
         {
             var newLocation = new Location()
             {
