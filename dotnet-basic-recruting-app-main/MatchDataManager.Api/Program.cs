@@ -10,9 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MatchDataDbContext>(
         options => options.UseSqlite("name=ConnectionStrings:DefaultConnection"));
 
-
-builder.Services.AddTransient<ILocationsRepository, LocationsRepository>();
-
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<ILocationsRepository, LocationsRepository>();
