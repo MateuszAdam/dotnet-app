@@ -14,13 +14,13 @@ public class LocationsRepository : ILocationsRepository
     {
         _context = context;
     }
-
+    
     public async Task<int> AddLocation(LocationModel location)
     {
         // added check if location name isnt already there      
 
         var existingLocation = await _context.Locations.FirstOrDefaultAsync(x => x.Name == location.Name);
-        if (existingLocation != null)
+        if (existingLocation == null)
         {
             var newLocation = new Location()
             {

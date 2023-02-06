@@ -26,7 +26,9 @@ public class TeamsController : ControllerBase
                 return CreatedAtAction(nameof(GetById), new { id = team.Id }, team);
             }
         }
-        return BadRequest();
+
+        ModelState.AddModelError("", "Added team name already exists, please change it");
+        return BadRequest(ModelState);
     }
 
     [HttpDelete]
@@ -52,7 +54,7 @@ public class TeamsController : ControllerBase
             return NotFound();
         }
 
-        return CreatedAtAction(nameof(UpdateTeam), teams); 
+        return Ok(teams); 
     }
 
     [HttpGet("{id:int}")]
@@ -64,7 +66,7 @@ public class TeamsController : ControllerBase
             return NotFound();
         }
 
-        return CreatedAtAction(nameof(GetById), team);
+        return Ok(team);
     }
 
     [HttpPut]
@@ -76,9 +78,10 @@ public class TeamsController : ControllerBase
 
             if (id > 0)
             {
-                return CreatedAtAction(nameof(UpdateTeam), team);
+                return Ok(team);
             }
         }
-        return NotFound();
+        ModelState.AddModelError("", "Please check added values for errors");
+        return NotFound(ModelState);
     }
 }

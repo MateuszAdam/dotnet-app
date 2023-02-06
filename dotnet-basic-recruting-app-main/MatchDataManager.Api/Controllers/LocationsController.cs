@@ -1,6 +1,9 @@
 using MatchDataManager.Api.Interfaces;
 using MatchDataManager.Api.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace MatchDataManager.Api.Controllers;
 
@@ -14,21 +17,27 @@ public class LocationsController : ControllerBase
     {
         _locationsRepository = locationsRepository;
     }
+
+    // instead of calling the repository methods here there could be another layer of service
+    // which would call the repository methods to proceed with the action
         
-    [HttpPost]
+    [HttpPost]    
     public async Task<IActionResult> AddLocation(LocationModel location)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Please check added values for errors");
+        }
+        else
         {
             int id = await _locationsRepository.AddLocation(location);
             if (id > 0)
             {
-                ModelState.Clear();
                 return CreatedAtAction(nameof(GetById), new { id = location.Id }, location);
             }
         }
-       
-        return BadRequest();        
+        ModelState.AddModelError("", "Added name already exists in db");
+        return BadRequest(ModelState);        
     }
 
     [HttpDelete]
@@ -50,7 +59,7 @@ public class LocationsController : ControllerBase
 
         if(locations != null && locations.Count > 0)
         {
-            return CreatedAtAction(nameof(GetAllLocations), locations);
+            return Ok(locations);
         }
         return NoContent();
     }
@@ -64,7 +73,7 @@ public class LocationsController : ControllerBase
             return NotFound();
         }
 
-        return CreatedAtAction(nameof(GetById), location);
+        return Ok(location);
     }
 
     [HttpPut]
@@ -76,10 +85,12 @@ public class LocationsController : ControllerBase
 
             if (id > 0)
             {
-                return CreatedAtAction(nameof(UpdateLocation), location);
+                return Ok(location);
             }
         }
+        ModelState.AddModelError("", "Please check added values for errors");
 
-        return NotFound();
+        return NotFound(ModelState);
     }
+        
 }
